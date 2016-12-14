@@ -16,6 +16,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 		// Override point for customization after application launch.
+		application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
+		
+		// process notification
+		if let options = launchOptions {
+			if let notification = options[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+				processNotification(notification)
+			}
+		}
+		
 		return true
 	}
 
@@ -40,7 +49,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationWillTerminate(application: UIApplication) {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
+	
+	func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+		processNotification(notification)
+	}
 
+	
+	// MARK: - private method for notification
+	
+	func processNotification(notification: UILocalNotification) {
+		if notification.userInfo == nil {
+			return;
+		}
+		
+		let userInfo = notification.userInfo
+		let type: NSString!
+		type = userInfo!["type"] as! NSString
+		
+		let vc: ViewController!
+		vc = window?.rootViewController as! ViewController
+		
+		if type.isEqualToString("record") {
+			vc.finishRecording(success: true)
+			
+		} else if type.isEqualToString("play") {
+			vc.stopPlayAudio()
+			
+		}
+	}
 
 }
 
